@@ -1,0 +1,6 @@
+scikit-learn
+matplotlib
+jupyter
+Keras
+numpy
+scikit-image
