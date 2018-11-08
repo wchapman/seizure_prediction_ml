@@ -13,7 +13,7 @@ nb_out = 1
 sequence_length = X_train[0].shape[0]
 
 # %% create model
-model = keras.Sequential()
+model = keras.models.Sequential()
 
 model.add(layers.LSTM(
            input_shape=(sequence_length, nb_features),

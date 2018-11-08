@@ -14,7 +14,7 @@ import sklearn.metrics
 import keras
 
 # %%
-def fit_eval_model(model_orig, Name=None, epochs=10, batch_size=10, sampleProp=1, downsample=10, freqs=None, coh=False):
+def fit_eval_model(model_orig, pats=[1,2,3], Name=None, epochs=10, batch_size=10, sampleProp=1, downsample=10, freqs=None, coh=False):
     """
     Deals with all loading/pre-proc/training/validation for the project. Simply pass in a model, some optional
     parameters, and this will deal with the rest.
@@ -25,7 +25,7 @@ def fit_eval_model(model_orig, Name=None, epochs=10, batch_size=10, sampleProp=1
     :return: None. Saves model and performance information
     """
 
-    for pat in [1]:#, 2, 3]:
+    for pat in pats:
         model = keras.models.clone_model(model_orig)
         model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
