@@ -42,8 +42,8 @@ def fit_eval_model(model_orig, pats=[1,2,3], Name=None, epochs=10, batch_size=10
         pred_val = model.predict(X_val)
         auc_val = sklearn.metrics.roc_auc_score(y_val, pred_val)
 
-        model.save('../outputs/' + Name + '_' + str(pat) + '.h5')
-        with open('../outputs/' + Name + '.txt', 'w') as f:
+        model.save('/projectnb/cs542/wchapman/outputs/' + Name + '_' + str(pat) + '.h5')
+        with open('/projectnb/cs542/wchapman/outputs/' + Name + '.txt', 'w') as f:
             f.write("%s\n" % loss_train)
             f.write("%s\n" % acc_train)
             f.write("%s\n" % auc_train)

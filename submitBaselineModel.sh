@@ -1,7 +1,7 @@
 #!/bin/bash -l
 
 #$ -P cs542
-#$ -l h_rt=12:00:00
+#$ -l h_rt=24:00:00
 #$ -N baselineModel
 #$ -l gpus=1 -l gpu_c=3.5
 
