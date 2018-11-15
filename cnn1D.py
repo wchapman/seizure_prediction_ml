@@ -13,6 +13,7 @@ X_train, y_train, X_val, y_val, X_test = utils.gen_dataset(1, sampleProp=100, do
 nb_features = X_train[0].shape[1]
 nb_out = 1
 sequence_length = X_train[0].shape[0]
+input_shape = sequence_length * nb_features
 
 # %% create model
 model = keras.Sequential()
