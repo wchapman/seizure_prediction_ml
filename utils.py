@@ -12,6 +12,7 @@ from sklearn.model_selection import train_test_split
 import sklearn
 import sklearn.metrics
 import keras
+import sklearn.preprocessing as preprocessing
 
 # %%
 def fit_eval_model(model_orig, pats=[1,2,3], Name=None, epochs=10, batch_size=10, sampleProp=1, downsample=10, freqs=None, coh=False):
@@ -30,6 +31,7 @@ def fit_eval_model(model_orig, pats=[1,2,3], Name=None, epochs=10, batch_size=10
         model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
         X_train, y_train, X_val, y_val, X_test = gen_dataset(pat, sampleProp=sampleProp, downsample=downsample, freqs=freqs, coh=coh)
+
         model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs)
 
         # training
@@ -44,16 +46,16 @@ def fit_eval_model(model_orig, pats=[1,2,3], Name=None, epochs=10, batch_size=10
 
         model.save('../outputs/' + Name + '_' + str(pat) + '.h5')
         with open('../outputs/' + Name + '.txt', 'w') as f:
-            f.write("%s\n" % loss_train)
-            f.write("%s\n" % acc_train)
-            f.write("%s\n" % auc_train)
-            f.write("%s\n" % loss_val)
-            f.write("%s\n" % acc_val)
-            f.write("%s\n" % auc_val)
+            f.write("loss_train: %s\n" % loss_train)
+            f.write("acc_train: %s\n" % acc_train)
+            f.write("auc_train: %s\n" % auc_train)
+            f.write("loss_val: %s\n" % loss_val)
+            f.write("acc_val: %s\n" % acc_val)
+            f.write("auc_val: %s\n" % auc_val)
 
 
 # %%
-def gen_dataset(pat, sampleProp=1, downsample=10, freqs=None, coh=False):
+def gen_dataset(pat, sampleProp=1, downsample=10, Freqs=False, coh=False):
     """
     Generates numpy arrays that can be directly fed into a Keras or sklean model.
 
@@ -77,7 +79,7 @@ def gen_dataset(pat, sampleProp=1, downsample=10, freqs=None, coh=False):
     dat = []
 
     for fn in lst:
-        ld = load_file(fn, downsample=downsample)
+        ld = load_file(fn, downsample=downsample, coh=coh, Freqs=Freqs)
         #TODO: append preproc features here
         dat.append(ld)
 
@@ -99,7 +101,7 @@ def gen_dataset(pat, sampleProp=1, downsample=10, freqs=None, coh=False):
 
 
 # %%
-def load_file(fname, downsample=1):
+def load_file(fname, downsample=1, coh=False, Freqs=False):
     """
     loadFile(fullFileName.hd5)
     returns: 10 minutes of data in a (240000, 16) numpy array
@@ -114,30 +116,27 @@ def load_file(fname, downsample=1):
         sn[i] = dat[i][0]
         samples[i, :] = dat[i][3]
 
+    if coh:
+        pass # TODO: Implement me
+
+    if Freqs:
+        samples = spectral_responses(samples)
+
     samples = skimage.measure.block_reduce(samples, block_size=(downsample, 1), func=np.mean)
 
     return samples
 
+
 # %%
-def butter_filter(data, lowcut, highcut, fs, order=2):
-    """
-    Performs time-frequency filtering on data
-    :param data: numpy array of data to filter
-    :param lowcut: lowpass end of butterworth filter (Hz)
-    :param highcut: highpass end (Hz)
-    :param fs: Sampling rate of data (Hz)
-    :param order: Filter order (default: 2)
-    :return: filtered signal
-    """
-    nyq = 0.5 * fs
-    low = lowcut / nyq
-    high = highcut / nyq
-    b, a = scipy.signal.butter(order, [low, high],  btype='band')
-    signal = scipy.signal.lfilter(b, a, data)
-    # hb = scipy.signal.hilbert(signal)
-    # amp = np.real(hb)
-    # ang = np.imag(hb)
-    return signal
+def wavelet(data):
+    from scipy import signal
+    from sklearn import preprocessing
+    fs = 400
+    sig = signal.cwt(data, signal.ricker, (fs/2, fs/6, fs/10, fs/21, fs/45))
+    sig = np.apply_along_axis(sklearn.preprocessing.scale, 1, sig)
+    sig = np.swapaxes(sig, 0, 1)
+    return sig
+    
 
 # %%
 def spectral_responses(data):
@@ -145,13 +144,10 @@ def spectral_responses(data):
     :param data:
     :return:
     """
-    delta = butter_filter(data, 0.1, 4, 400, 2)
-    theta = butter_filter(data, 4, 8, 400, 2)
-    alpha= butter_filter(data, 8, 12, 400, 2)
-    beta= butter_filter(data, 12, 30, 400, 2)
-    gamma = butter_filter(data, 30, 60, 400, 2)
-
-    return delta, theta, alpha, beta, gamma
+    data_ap = data
+    for chan in np.arange(0, data.shape[1]):
+        data_ap = np.append(data_ap,wavelet(data[:, chan]), axis=1)
+    return data_ap
 
 # %%
 def read_frames(fname=None):
