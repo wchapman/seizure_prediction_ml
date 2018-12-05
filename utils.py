@@ -99,6 +99,37 @@ def gen_dataset(pat, sampleProp=1, downsample=10, Freqs=False, coh=False):
 
     return X_train, y_train, X_val, y_val, X_test
 
+# %%
+def load_all_subj(pat, sampleProp=1, downsample=10, Freqs=False, coh=False):
+    """
+    Generates numpy arrays that can be directly fed into a Keras or sklean model.
+
+    :param pat: Which patient
+    :param sampleProp: Take only every nth trial, for quick training
+    :param downsample: Downsample by some factor
+    :param freqs: Calculates power in these 1Hz bands and passes into model   #TODO
+    :param coh: Calculates coherence between channels, and passes into model  #TODO
+
+    :return: (X_train, y_train, X_val, y_val, X_test)
+    """
+
+    #  Load data
+    df = read_frames()
+    lst = df['image'][(np.logical_and(np.equal(df['pat'], pat), df['train']))]  # list of files
+    labels = df['class'][(np.logical_and(np.equal(df['pat'], pat), df['train']))]
+
+    lst = lst.values[np.arange(0, len(labels), sampleProp)]
+    labels = labels.values[np.arange(0, len(labels), sampleProp)]
+
+    dat = []
+
+    for fn in lst:
+        ld = load_file(fn, downsample=downsample, coh=coh, Freqs=Freqs)
+        #TODO: append preproc features here
+        dat.append(ld)
+
+    dat = np.asarray(dat)
+    return dat, labels, lst
 
 # %%
 def load_file(fname, downsample=1, coh=False, Freqs=False):
