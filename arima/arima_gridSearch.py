@@ -75,7 +75,7 @@ def create_model(dropout=0., nn = [1], l1=0, l2=0):
 # %%
 l1 = np.append(np.power(10., np.arange(-5, -1, 2)), 0)
 l2 = np.append(np.power(10., np.arange(-5, -1, 2)), 0)
-epochs = [10]
+epochs = [1000]
 batch_size = [4, 32, 64]
 dropout = np.arange(0, 0.3, 0.05)
 
