@@ -11,6 +11,7 @@ import utils
 
 # %% configs
 subject = 3
+pat = subject
 model_order = 5      # 10 = 10Hz
 blockSize =   40*30  # 40 = 1 second
 
@@ -47,3 +48,30 @@ for i in range(0, coef.shape[0]):
 # %% Save to disk
 np.savez('/projectnb/cs542/wchapman/seizure_prediction_ml/arima/fits/s' + str(subject) +'_40Hz', X=X, y=y, lst=lst) 
 df.to_pickle('/projectnb/cs542/wchapman/seizure_prediction_ml/arima/fits/s' + str(subject) + '_coefs')
+
+
+
+# %% Now append variable length blocks
+model_order = 5 #10 = 4Hz, 5=8 Hz
+npz = np.load('/projectnb/cs542/wchapman/seizure_prediction_ml/arima/fits/s' + str(pat) + '_40Hz.npz')
+X = npz['X']
+y = npz['y']
+cc = []
+
+blockSizes =   [40*10, 40*30, 40*60, 40*60*10]  # 40 = 1 second
+
+for blockSize in blockSizes:
+    coef_block = np.zeros((X.shape[0], int(X.shape[1] / blockSize), model_order, 16, 16))
+    for i in range(0, X.shape[0]):  # for each trial
+        for k in range(0, coef_block.shape[1]):  # for each block
+            try:
+                inds = np.arange(k * blockSize, (k + 1) * blockSize)
+                coef_block[i][k], noise = pdc_dtf.mvar_fit(X[i][inds][:].transpose(), model_order)
+            except:  # missing data in this block
+                coef_block[i][k] = np.zeros(coef_block[0][0].shape)
+    cc.append(coef_block)
+
+import pickle
+
+pickle.dump(cc, open('/projectnb/cs542/wchapman/seizure_prediction_ml/arima/fits/s' + str(pat) + '_coefs2', "wb"))
+pickle.dump(y, open('/projectnb/cs542/wchapman/seizure_prediction_ml/arima/fits/s' + str(pat) + '_y', "wb"))
