@@ -17,6 +17,7 @@ from sklearn.metrics import roc_curve
 from sklearn.linear_model import LogisticRegression
 import matplotlib.pyplot as plt
 from sklearn import svm
+from sklearn.ensemble import RandomForestClassifier
 
 sys.path.append('/projectnb/cs542/wchapman/seizure_prediction_ml')
 sys.path.append('/projectnb/cs542/wchapman/seizure_prediction_ml/arima')
@@ -24,8 +25,11 @@ import utils
 import utils
 
 %matplotlib auto
-# %% Load coefficients
 plt.figure()
+
+# %% Load coefficients
+
+plt.subplot(2,2,1)
 models = list()
 for pat in range(1, 4):
     coefs = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/arima/fits/s' +str(pat) +'_coefs2',"rb"))
@@ -71,7 +75,7 @@ for pat in range(1, 4):
 
     models.append(model)
 
-    # %% Get ROC
+    # Get ROC
 
     logit_roc_auc = roc_auc_score(y_train, model.predict_proba(x_train))
     print(logit_roc_auc)
@@ -81,15 +85,13 @@ for pat in range(1, 4):
     plt.plot([0, 1], [0, 1],'r--')
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('Receiver operating characteristic')
+    plt.title('NN: 0.87')
     plt.legend(loc="lower right")
     #plt.savefig('final_ROC')
 
 # %% Logistic Regression
 
-plt.figure()
+plt.subplot(2,2,2)
 for pat in range(1, 4):
     coefs = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/arima/fits/s' +str(pat) +'_coefs2',"rb"))
     y = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/arima/fits/s' +str(pat) +'_y',"rb"))
@@ -122,14 +124,12 @@ for pat in range(1, 4):
     plt.plot([0, 1], [0, 1], 'r--')
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('Receiver operating characteristic')
+    plt.title('Logistic: 0.83')
     plt.legend(loc="lower right")
 
 # %% SVM
 
-plt.figure()
+plt.subplot(2,2,3)
 for pat in range(1, 4):
     coefs = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/arima/fits/s' +str(pat) +'_coefs2',"rb"))
     y = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/arima/fits/s' +str(pat) +'_y',"rb"))
@@ -162,7 +162,42 @@ for pat in range(1, 4):
     plt.plot([0, 1], [0, 1], 'r--')
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('Receiver operating characteristic')
+    plt.title('SVM: 0.82')
+    plt.legend(loc="lower right")
+
+# %% Random Forest
+plt.subplot(2,2,4)
+for pat in range(1, 4):
+    coefs = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/arima/fits/s' +str(pat) +'_coefs2',"rb"))
+    y = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/arima/fits/s' +str(pat) +'_y',"rb"))
+    X = coefs[-1]
+
+    if X.shape[1] > 1:
+        X_flat = np.zeros((X.shape[0],                             # n_trials
+                           X.shape[1],                             # n_blocks
+                           X.shape[2] * X.shape[3] * X.shape[4]))  # n_fets
+        for trial in range(0, X_flat.shape[0]):
+            for block in range(0, X_flat.shape[1]):
+                X_flat[trial][block] = X[trial][block].flatten()
+    else:
+        X_flat = np.zeros((X.shape[0],
+                           X.shape[2] * X.shape[3] * X.shape[4]))  # n_fets
+
+        for trial in range(0, X_flat.shape[0]):
+            for block in range(0, X_flat.shape[1]):
+                X_flat[trial] = X[trial].flatten()
+
+
+    x_train, x_test, y_train, y_test = train_test_split(X_flat, y, stratify=y)
+    clf = RandomForestClassifier(n_estimators=50)
+    clf.fit(x_train, y_train)
+    logit_roc_auc = roc_auc_score(y_test, clf.predict_proba(x_test)[:,1])
+    print(logit_roc_auc)
+
+    fpr, tpr, thresholds = roc_curve(y_test, clf.predict_proba(x_test)[:,1])
+    plt.plot(fpr, tpr, label='Pat%d (AUC = %0.2f)' % (pat, logit_roc_auc))
+    plt.plot([0, 1], [0, 1], 'r--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.title('Random Forest: 0.79')
     plt.legend(loc="lower right")
