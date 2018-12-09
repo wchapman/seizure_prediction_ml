@@ -3,15 +3,15 @@ import numpy as np
 import pandas as pd
 import sys
 sys.path.append('/projectnb/cs542/wchapman/seizure_prediction_ml')
-sys.path.append('/projectnb/cs542/wchapman/seizure_prediction_ml/arima')
+sys.path.append('/projectnb/cs542/wchapman/seizure_prediction_ml/features')
 
 import utils
 import pdc_dtf
 
 # %%
 pat = 3
-df = pd.read_pickle('/projectnb/cs542/wchapman/seizure_prediction_ml/arima/fits/s' +str(pat) +'_coefs')
-npz = np.load('/projectnb/cs542/wchapman/seizure_prediction_ml/arima/fits/s2_40Hz.npz')
+df = pd.read_pickle('/projectnb/cs542/wchapman/seizure_prediction_ml/features/fits/s' +str(pat) +'_coefs')
+npz = np.load('/projectnb/cs542/wchapman/seizure_prediction_ml/features/fits/s2_40Hz.npz')
 dfs = utils.read_frames()
 dfs = dfs[(dfs['pat']==pat) & (dfs['train']==1)]
 y = dfs['class'].values

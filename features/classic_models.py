@@ -5,7 +5,6 @@ fit each trial (sampled at 40Hz) seperately. Coefficients are then passed into a
 
 # %% Imports
 import numpy as np
-import pandas as pd
 import sys
 
 from sklearn.model_selection import train_test_split
@@ -21,10 +20,7 @@ from sklearn.ensemble import RandomForestClassifier
 
 sys.path.append('/projectnb/cs542/wchapman/seizure_prediction_ml')
 sys.path.append('/projectnb/cs542/wchapman/seizure_prediction_ml/features')
-import utils
-import utils
 
-%matplotlib auto
 plt.figure()
 
 # %% Load coefficients

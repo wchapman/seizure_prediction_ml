@@ -1,2 +1,5 @@
-# seizure_prediction_ml
-See baselineModel.py as an example of how to use the various functions in utils.py to easily run a Keras model.
+# Seizure Prediction Challenge (Group#3)
+- Please see the `writeup` folder for poster and final report.
+- Feature-based classifier code lives in `features`
+- CNN-based classifiers live in `cnn`
+- Unified model also lives in `features`

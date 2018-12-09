@@ -1,20 +1,7 @@
 # %% import
 
 import numpy as np
-import pandas as pd
 import sys
-
-from sklearn.model_selection import train_test_split
-import keras
-import keras.layers as layers
-import pickle
-import sklearn
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import roc_curve
-from sklearn.linear_model import LogisticRegression
-import matplotlib.pyplot as plt
-from sklearn import svm
-from sklearn.ensemble import RandomForestClassifier
 import scipy
 
 sys.path.append('/projectnb/cs542/wchapman/seizure_prediction_ml')

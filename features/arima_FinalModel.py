@@ -5,7 +5,6 @@ fit each trial (sampled at 40Hz) seperately. Coefficients are then passed into a
 
 # %% Imports
 import numpy as np
-import pandas as pd
 import sys
 
 from sklearn.model_selection import train_test_split
@@ -20,20 +19,17 @@ from sklearn import svm
 from sklearn.ensemble import RandomForestClassifier
 
 sys.path.append('/projectnb/cs542/wchapman/seizure_prediction_ml')
-sys.path.append('/projectnb/cs542/wchapman/seizure_prediction_ml/arima')
-import utils
-import utils
+sys.path.append('/projectnb/cs542/wchapman/seizure_prediction_ml/features')
 
-%matplotlib auto
 plt.figure()
 
 # %% Load coefficients
 
-plt.subplot(2,2,1)
+plt.subplot(2, 2, 1)
 models = list()
 for pat in range(1, 4):
-    coefs = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/arima/fits/s' +str(pat) +'_coefs2',"rb"))
-    y = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/arima/fits/s' +str(pat) +'_y',"rb"))
+    coefs = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/features/fits/s' +str(pat) +'_coefs2',"rb"))
+    y = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/features/fits/s' +str(pat) +'_y',"rb"))
     X = coefs[-1]
 
     if X.shape[1] > 1:
@@ -93,8 +89,8 @@ for pat in range(1, 4):
 
 plt.subplot(2,2,2)
 for pat in range(1, 4):
-    coefs = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/arima/fits/s' +str(pat) +'_coefs2',"rb"))
-    y = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/arima/fits/s' +str(pat) +'_y',"rb"))
+    coefs = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/features/fits/s' +str(pat) +'_coefs2',"rb"))
+    y = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/features/fits/s' +str(pat) +'_y',"rb"))
     X = coefs[-1]
 
     if X.shape[1] > 1:
@@ -131,8 +127,8 @@ for pat in range(1, 4):
 
 plt.subplot(2,2,3)
 for pat in range(1, 4):
-    coefs = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/arima/fits/s' +str(pat) +'_coefs2',"rb"))
-    y = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/arima/fits/s' +str(pat) +'_y',"rb"))
+    coefs = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/features/fits/s' +str(pat) +'_coefs2',"rb"))
+    y = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/features/fits/s' +str(pat) +'_y',"rb"))
     X = coefs[-1]
 
     if X.shape[1] > 1:
@@ -168,8 +164,8 @@ for pat in range(1, 4):
 # %% Random Forest
 plt.subplot(2,2,4)
 for pat in range(1, 4):
-    coefs = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/arima/fits/s' +str(pat) +'_coefs2',"rb"))
-    y = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/arima/fits/s' +str(pat) +'_y',"rb"))
+    coefs = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/features/fits/s' +str(pat) +'_coefs2',"rb"))
+    y = pickle.load(open('/projectnb/cs542/wchapman/seizure_prediction_ml/features/fits/s' +str(pat) +'_y',"rb"))
     X = coefs[-1]
 
     if X.shape[1] > 1:
